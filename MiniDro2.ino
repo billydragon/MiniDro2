@@ -7,22 +7,7 @@ Chip            :   STM32F103CBT6
 freq uc         :   72Mhz (use 8Mhz external oscillator with PLL ) 
 Compiler        :   Arduino IDE 1.8.3
 Author          :   G.Pailleret, 2020 
-Remark          :  ok
-Hardware config : 
-                    * Oled display in I2C_1 (SCL = PB6 and SDA = PB7) use STM32 I2C function
-                    * Quadrature decoder X on Timer1 ( PA8 and PA9)
-                    * Quadrature decoder Y on Timer3 ( PA6 and PA7)
-                    * Quadrature decoder Z on Timer2 ( PA0 and PA1)
-                    * Button X (X reset) on PB15
-                    * Button Y (Y reset) on PB14
-                    * Button Z (Z reset) on PB12
-                    * Button M (M reset) on PB13
-                    * Navigation :
-                    *           UP(PB15)
-                    *  Left     OK(PB14)      Right      CANCEL(PB13)
-                    *          DOWN(PB12)
-                    *
-                    *
+Remark          :  
 Revision        :
 
 *********************************************************************/
@@ -31,9 +16,7 @@ Revision        :
 #include "src/QuadDecoder/QuadDecoder.h"
 #include <EEPROM.h>
 
-
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
-
 
 typedef struct
 {
@@ -77,7 +60,6 @@ GEMItem menuItemRelX("Relative X", RelativeModeX,UpdateRelAxe);
 GEMItem menuItemRelY("Relative Y", RelativeModeY,UpdateRelAxe);
 GEMItem menuItemRelZ("Relative Z", RelativeModeZ,UpdateRelAxe);
 
-
 // Create menu object of class GEM_u8g2. Supply its constructor with reference to u8g2 object we created earlier
 GEM_u8g2 menu(u8g2);
 
@@ -91,8 +73,6 @@ QuadDecoder Quad_X(1,0xFFFF,512,false,false,IT_Timer1_Overflow); //Timer 1
 void IT_Timer1_Overflow(){Quad_X.IT_OverflowHardwareTimer();}
 void IT_Timer2_Overflow(){Quad_Z.IT_OverflowHardwareTimer();}
 void IT_Timer3_Overflow(){Quad_Y.IT_OverflowHardwareTimer();}
-
-
 
 void setup() {
 
@@ -139,7 +119,7 @@ void loop() {
   }
 }
 
-// Setup context
+// Setup context for DRO main display
 void ActionDro() {
   menu.context.loop = DroContextLoop;
   menu.context.enter = DroContextEnter;
@@ -147,13 +127,10 @@ void ActionDro() {
   menu.context.allowExit = false; // Setting to false will require manual exit from the loop
   menu.context.enter();
 }
-// Invoked once when the button is pressed
 void DroContextEnter() {
   // Clear sreen
   u8g2.clear();
 }
-
-// Invoked every loop iteration
 void DroContextLoop() {
   // Detect key press manually using U8g2 library
   byte key = u8g2.getMenuEvent();
@@ -168,15 +145,12 @@ void DroContextLoop() {
     DisplayDrawInformations();
   }
 }
-// Invoked once when the GEM_KEY_CANCEL key is pressed
 void DroContextExit() 
 {
-  // Draw menu back on screen and clear context
   menu.reInit();
   menu.drawMenu();
   menu.clearContext();
 }
-
 void Restore_Config()
 {
   //Read Config in Memory
@@ -244,7 +218,6 @@ void ActionSaveSettingsInFlash()
   //PrintInformationOnScreen("Save in flash");
   //delay(100);   
 }
-
 void DisplayDrawInformations()
 {
   char buffer_x[16];
@@ -257,7 +230,6 @@ void DisplayDrawInformations()
   u8g2.clearBuffer();          // clear the internal memory
   u8g2.drawLine(0,0,0,63);
   u8g2.drawLine(0,63,127,63);
-  
   u8g2.setFont(u8g2_font_t0_22_mr); // choose a suitable font
   if(Quad_X.RelativeModeActived())u8g2.setColorIndex(0);
   u8g2.drawStr(2,0,"X");
@@ -273,7 +245,6 @@ void DisplayDrawInformations()
   u8g2.drawStr(15,40,buffer_z);  // write something to the internal memory
   u8g2.sendBuffer();          // transfer internal memory to the display 
 }
-
 void UpdateRelAxe()
 {  
   if( RelativeModeX == true ) Quad_X.SetRelative();
