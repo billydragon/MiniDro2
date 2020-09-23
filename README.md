@@ -8,8 +8,7 @@ A Digital readout (DRO) display for lathe or milling machine with :
 - Use the Arduino ide (STM32duino)
 
 ## Input / Output
-
-###### Keyboard
+### Keyboard
 The system use 6 push buttons for the navigation (joystick configuration) : 
 - Up button ( pin PB15 )
 - Down button ( pin PB12 )
@@ -20,7 +19,7 @@ The system use 6 push buttons for the navigation (joystick configuration) :
 
 The GEM menu library is used  : https://github.com/Spirik/GEM
 
-###### Quadrature encoder input
+### Quadrature encoder input
 The system can handle 3 quadrature encoder : 
 - Quadrature decoder X on Timer1 ( A=PA8 and B=PA9)
 - Quadrature decoder Y on Timer3 ( A=PA6 and B=PA7)
