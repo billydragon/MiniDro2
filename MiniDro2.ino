@@ -259,7 +259,7 @@ void DisplayDrawInformations()
   u8g2.drawRFrame(19,36,108,18,3);
 
   u8g2.setFont(u8g2_font_profont10_mr); // choose a suitable font
-  u8g2.drawStr(2,56,"Tool:Tool_0");
+  u8g2.drawStr(0,54,selectTool.getSelectedOptionName((byte*)&ToolChoose ));
   //u8g2.sendBuffer();          // transfer internal memory to the display 
   } while (u8g2.nextPage());
 }

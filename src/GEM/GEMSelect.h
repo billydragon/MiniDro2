@@ -65,6 +65,8 @@ class GEMSelect {
     GEMSelect(byte length_, SelectOptionInt* options_);
     GEMSelect(byte length_, SelectOptionByte* options_);
     GEMSelect(byte length_, SelectOptionChar* options_);
+    
+    char* getSelectedOptionName(void* variable);
   private:
     byte _type;
     byte _length;
@@ -72,7 +74,7 @@ class GEMSelect {
     byte getType();
     byte getLength();
     int getSelectedOptionNum(void* variable);
-    char* getSelectedOptionName(void* variable);
+    
     char* getOptionNameByIndex(int index);
     void setValue(void* variable, int index);  // Assign value of the selected option to supplied variable
 };
