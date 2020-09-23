@@ -17,14 +17,19 @@ The system use 6 push buttons for the navigation (joystick configuration) :
 - Ok button ( pin PB15 )
 - Cancel button ( pin PB13 )
 
-The GEM menu library is used  : https://github.com/Spirik/GEM
+The GEM menu library is used : https://github.com/Spirik/GEM
 
 ### Quadrature encoder input
 The system can handle 3 quadrature encoder : 
 - Quadrature decoder X on Timer1 ( A=PA8 and B=PA9)
 - Quadrature decoder Y on Timer3 ( A=PA6 and B=PA7)
 - Quadrature decoder Z on Timer2 ( A=PA0 and B=PA1)
+### Oled display
+The system use a Oled SSD1306 128 x 64 screen with hardware I2C communication. 
+- SCL = PB6 ( need a 1,5kOhm external resistance to vcc) 
+- SDA = PB7 ( need a 1,5kOhm external resistance to vcc)
 
+The graphical library used is u8g2 : https://github.com/olikraus/u8g2
 
 ## Installation
 1. Install ARDUINO IDE V1.8.8
