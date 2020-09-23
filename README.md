@@ -3,7 +3,7 @@ A dro display for lathe or milling machine with a STM32F103CBT6 microcontroler f
 Use a Oled SSD1306 128 x 64 screen with hardware I2C communication and 6 push buttons for interaction with the User. 
 Use the Arduino ide.
 
-#Installation
+# Installation
 1 - Install ARDUINO IDE V1.8.8
 2 - Download a zip file containing the Arduino STM32 files : https://github.com/rogerclarkmelbourne/Arduino_STM32/archive/master.zip
 3 - Unzip the content of the zip file, and place the Arduino_STM32 folder to [Arduino sketches folder]/[hardware]/[Arduino_STM32]. 
