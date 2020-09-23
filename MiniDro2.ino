@@ -3,7 +3,7 @@ Project Name    :   Mini Dro 2
 Hard revision   :   V1.0
 Soft revision   :   /
 Description     :   Dro system for lathe or milling machine with 3 quadrature decoder, Oled SSD1306 display and 6 push buttons for navigation
-Chip            :   STM32F103C8T6
+Chip            :   STM32F103CBT6
 freq uc         :   72Mhz (use 8Mhz external oscillator with PLL ) 
 Compiler        :   Arduino IDE 1.8.3
 Author          :   G.Pailleret, 2020 
