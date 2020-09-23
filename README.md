@@ -8,6 +8,14 @@ A Digital readout (DRO) display for lathe or milling machine with :
 - Use the Arduino ide (STM32duino)
 
 ## User interface
+The système use 6 push buttons for the navigation (joystick configuration) : 
+- Up button ( pin PB15 )
+- Down button ( pin PB12 )
+- Left button 
+- Right button
+- Ok button ( pin PB15 )
+- Cancel button ( pin PB13 )
+
 
 
 ## Installation
