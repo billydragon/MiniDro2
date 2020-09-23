@@ -7,6 +7,9 @@ A Digital readout (DRO) display for lathe or milling machine with :
 - 6 push buttons for interaction with the User. 
 - Use the Arduino ide (STM32duino)
 
+## User interface
+
+
 ## Installation
 1. Install ARDUINO IDE V1.8.8
 2. Download a zip file containing the Arduino STM32 files : https://github.com/rogerclarkmelbourne/Arduino_STM32/archive/master.zip
@@ -20,4 +23,5 @@ Example how the path should look like: C:\Users\<user>\Documents\Arduino\hardwar
 8. Choose : Tools > CPU Speed Mhz:"72Mhz (Normal)"
 9. Add additionnal board manager URL : File > Preferences > Additional Boards Manager URLs : "http://dan.drown.org/stm32duino/package_STM32duino_index.json"
 10. Install Arduino SAM Boards : Tools > Boards Manager > Install Arduino SAM boards ( 32bits cortex M3)
-11. Compile ...
+11. Install the libraries (Tools > Manage libraries ): u8g2 
+12. Compile ...
