@@ -98,7 +98,7 @@ void setup() {
 
   // U8g2 library init. Pass pin numbers the buttons are connected to.
   // The push-buttons should be wired with pullup resistors (so the LOW means that the button is pressed)
-  u8g2.begin(/*Select/OK=*/ PB14, /*Right/Next=*/ 4, /*Left/Prev=*/ 3, /*Up=*/ PB15, /*Down=*/ PB12, /*Home/Cancel=*/ PB13);
+  u8g2.begin(/*Select/OK=*/ PB14, /*Right/Next=*/ PB1, /*Left/Prev=*/ PB0, /*Up=*/ PB15, /*Down=*/ PB12, /*Home/Cancel=*/ PB13);
   //Restore config  
   Restore_Config();
   // Menu init, setup and draw
