@@ -52,6 +52,15 @@ GEMPage menuPageMain("Dro Menu");
 GEMPage menuPageSettings("Main Settings"); // Settings submenu
 GEMItem menuItemMainSettings("Main Settings", menuPageSettings);
 
+//For tool selection
+byte ToolChoose = 0;
+SelectOptionByte selectToolOptions[] = {{"Tool_0", 0}, {"Tool_1", 1}, {"Tool_2", 2}, {"Tool_3", 3}, {"Tool_4", 4}, {"Tool_5", 5}};
+GEMSelect selectTool(sizeof(selectToolOptions)/sizeof(SelectOptionByte), selectToolOptions);
+void applyTool(); // Forward declaration
+GEMItem menuItemTool("Tool:", ToolChoose, selectTool, applyTool);
+
+
+
 boolean RelativeModeX = false;
 boolean RelativeModeY = false;
 boolean RelativeModeZ = false;
@@ -91,6 +100,7 @@ void setup() {
 void setupMenu() {
   // Add menu items to menu page
   menuPageMain.addMenuItem(menuItemButton);
+  menuPageMain.addMenuItem(menuItemTool);
   menuPageMain.addMenuItem(menuItemRelX);
   menuPageMain.addMenuItem(menuItemRelY);
   menuPageMain.addMenuItem(menuItemRelZ);
@@ -226,24 +236,32 @@ void DisplayDrawInformations()
   sprintf(buffer_x,"%+4.3f",Quad_X.GetValue());
   sprintf(buffer_y,"%+4.3f",Quad_Y.GetValue());
   sprintf(buffer_z,"%+4.3f",Quad_Z.GetValue());
+
+  u8g2.firstPage();
+  do {
   u8g2.setColorIndex(1);
-  u8g2.clearBuffer();          // clear the internal memory
-  u8g2.drawLine(0,0,0,63);
-  u8g2.drawLine(0,63,127,63);
-  u8g2.setFont(u8g2_font_t0_22_mr); // choose a suitable font
+  //u8g2.setFont(u8g2_font_t0_22_mr); // choose a suitable font
+  u8g2.setFont(u8g2_font_profont22_tf); // choose a suitable font
   if(Quad_X.RelativeModeActived())u8g2.setColorIndex(0);
-  u8g2.drawStr(2,0,"X");
+  u8g2.drawStr(2,1,"X");
   u8g2.setColorIndex(1);  
-  u8g2.drawStr(15,0,buffer_x);  // write something to the internal memory
+  u8g2.drawStr(20,1,buffer_x);  // write something to the internal memory
+  u8g2.drawRFrame(19,0,108,18,3); 
   if(Quad_Y.RelativeModeActived())u8g2.setColorIndex(0);
-  u8g2.drawStr(2,20,"Y");
+  u8g2.drawStr(2,19,"Y");
   u8g2.setColorIndex(1);
-  u8g2.drawStr(15,20,buffer_y);  // write something to the internal memory
+  u8g2.drawStr(20,19,buffer_y);  // write something to the internal memory
+  u8g2.drawRFrame(19,18,108,18,3);
   if(Quad_Z.RelativeModeActived())u8g2.setColorIndex(0);
-  u8g2.drawStr(2,40,"Z");
+  u8g2.drawStr(2,37,"Z");
   u8g2.setColorIndex(1);
-  u8g2.drawStr(15,40,buffer_z);  // write something to the internal memory
-  u8g2.sendBuffer();          // transfer internal memory to the display 
+  u8g2.drawStr(20,37,buffer_z);  // write something to the internal memory
+  u8g2.drawRFrame(19,36,108,18,3);
+
+  u8g2.setFont(u8g2_font_profont10_mr); // choose a suitable font
+  u8g2.drawStr(2,56,"Tool:Tool_0");
+  //u8g2.sendBuffer();          // transfer internal memory to the display 
+  } while (u8g2.nextPage());
 }
 void UpdateRelAxe()
 {  
@@ -253,4 +271,10 @@ void UpdateRelAxe()
   else Quad_Y.SetAbsolut(); 
   if( RelativeModeZ == true ) Quad_Z.SetRelative();
   else Quad_Z.SetAbsolut();     
+}
+
+void applyTool()
+{
+  
+  
 }
