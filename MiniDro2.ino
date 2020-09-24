@@ -39,18 +39,20 @@ GEMItem menuItemDiamY("Diameter Y", ConfigDro.Diameter_Mode_Y);
 GEMItem menuItemResoX("Resolution X", ConfigDro.Reso_X);
 GEMItem menuItemResoY("Resolution Y", ConfigDro.Reso_Y);
 GEMItem menuItemResoZ("Resolution Z", ConfigDro.Reso_Z);
+void ActionRestoreSettingsInFlash(); // Forward declaration
+GEMItem menuItemButtonRestoreSettings("Restore settings", ActionRestoreSettingsInFlash);
 void ActionSaveSettingsInFlash(); // Forward declaration
 GEMItem menuItemButtonSaveSettings("Save settings", ActionSaveSettingsInFlash);
 
 void ActionDro(); // Forward declaration
-GEMItem menuItemButton("Return to Dro...", ActionDro);
+GEMItem menuItemButton("DRO screen", ActionDro);
 
 //Main Page Menu
 GEMPage menuPageMain("Dro Menu");
 
 //Settings Page Menu
-GEMPage menuPageSettings("Main Settings"); // Settings submenu
-GEMItem menuItemMainSettings("Main Settings", menuPageSettings);
+GEMPage menuPageSettings("Settings"); // Settings submenu
+GEMItem menuItemMainSettings("Settings", menuPageSettings);
 
 //For tool selection
 byte ToolChoose = 0;
@@ -61,13 +63,10 @@ GEMItem menuItemTool("Tool:", ToolChoose, selectTool, applyTool);
 
 
 
-boolean RelativeModeX = false;
-boolean RelativeModeY = false;
-boolean RelativeModeZ = false;
+boolean RelativeMode = false;
 void UpdateRelAxe();
-GEMItem menuItemRelX("Relative X", RelativeModeX,UpdateRelAxe);
-GEMItem menuItemRelY("Relative Y", RelativeModeY,UpdateRelAxe);
-GEMItem menuItemRelZ("Relative Z", RelativeModeZ,UpdateRelAxe);
+GEMItem menuItemRelativeMode("Relative mode", RelativeMode,UpdateRelAxe);
+
 
 // Create menu object of class GEM_u8g2. Supply its constructor with reference to u8g2 object we created earlier
 GEM_u8g2 menu(u8g2);
@@ -101,9 +100,7 @@ void setupMenu() {
   // Add menu items to menu page
   menuPageMain.addMenuItem(menuItemButton);
   menuPageMain.addMenuItem(menuItemTool);
-  menuPageMain.addMenuItem(menuItemRelX);
-  menuPageMain.addMenuItem(menuItemRelY);
-  menuPageMain.addMenuItem(menuItemRelZ);
+  menuPageMain.addMenuItem(menuItemRelativeMode);
   //Add Sub menu Settings
   menuPageMain.addMenuItem(menuItemMainSettings); 
   menuPageSettings.addMenuItem(menuItemDirX);
@@ -113,6 +110,7 @@ void setupMenu() {
   menuPageSettings.addMenuItem(menuItemDirZ);
   menuPageSettings.addMenuItem(menuItemResoZ);
   menuPageSettings.addMenuItem(menuItemDiamY);
+  menuPageSettings.addMenuItem(menuItemButtonRestoreSettings);
   menuPageSettings.addMenuItem(menuItemButtonSaveSettings);
   // Specify parent menu page for the Settings menu page
   menuPageSettings.setParentMenuPage(menuPageMain);
@@ -228,6 +226,12 @@ void ActionSaveSettingsInFlash()
   //PrintInformationOnScreen("Save in flash");
   //delay(100);   
 }
+void ActionRestoreSettingsInFlash()
+{
+  //Save default config in flash
+  SaveConfigInFlash((sConfigDro*)&csConfigDefault);
+  Restore_Config();  
+}
 void DisplayDrawInformations()
 {
   char buffer_x[16];
@@ -242,17 +246,14 @@ void DisplayDrawInformations()
   u8g2.setColorIndex(1);
   //u8g2.setFont(u8g2_font_t0_22_mr); // choose a suitable font
   u8g2.setFont(u8g2_font_profont22_tf); // choose a suitable font
-  if(Quad_X.RelativeModeActived())u8g2.setColorIndex(0);
   u8g2.drawStr(2,1,"X");
   u8g2.setColorIndex(1);  
   u8g2.drawStr(20,1,buffer_x);  // write something to the internal memory
   u8g2.drawRFrame(19,0,108,18,3); 
-  if(Quad_Y.RelativeModeActived())u8g2.setColorIndex(0);
   u8g2.drawStr(2,19,"Y");
   u8g2.setColorIndex(1);
   u8g2.drawStr(20,19,buffer_y);  // write something to the internal memory
   u8g2.drawRFrame(19,18,108,18,3);
-  if(Quad_Z.RelativeModeActived())u8g2.setColorIndex(0);
   u8g2.drawStr(2,37,"Z");
   u8g2.setColorIndex(1);
   u8g2.drawStr(20,37,buffer_z);  // write something to the internal memory
@@ -260,17 +261,26 @@ void DisplayDrawInformations()
 
   u8g2.setFont(u8g2_font_profont10_mr); // choose a suitable font
   u8g2.drawStr(0,54,selectTool.getSelectedOptionName((byte*)&ToolChoose ));
+
+  if(RelativeMode==true)u8g2.drawStr(80,54,"Relative");
+  else u8g2.drawStr(80,54,"Absolute");
   //u8g2.sendBuffer();          // transfer internal memory to the display 
   } while (u8g2.nextPage());
 }
 void UpdateRelAxe()
 {  
-  if( RelativeModeX == true ) Quad_X.SetRelative();
-  else Quad_X.SetAbsolut();  
-  if( RelativeModeY == true ) Quad_Y.SetRelative();
-  else Quad_Y.SetAbsolut(); 
-  if( RelativeModeZ == true ) Quad_Z.SetRelative();
-  else Quad_Z.SetAbsolut();     
+  if( RelativeMode == true )
+  {
+    Quad_X.SetRelative();  
+    Quad_Y.SetRelative();
+    Quad_Z.SetRelative();
+  }
+  else
+  {
+    Quad_X.SetAbsolut();  
+    Quad_Y.SetAbsolut();
+    Quad_Z.SetAbsolut();
+  }      
 }
 
 void applyTool()
