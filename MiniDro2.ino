@@ -14,9 +14,29 @@ Revision        :
 
 #include "src/GEM/GEM_u8g2.h"
 #include "src/QuadDecoder/QuadDecoder.h"
+#include "src/Keypad/Keypad.h"
 #include <EEPROM.h>
 
+#define USE_KEYPAD_KEYBOARD
+
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
+
+#ifdef USE_KEYPAD_KEYBOARD
+  const byte ROWS = 4; //four rows
+  const byte COLS = 4; //four columns
+  char hexaKeys[ROWS][COLS] = {
+    {'Z'             ,'Z'           ,GEM_KEY_UP   ,'Z'            },
+    {GEM_KEY_CANCEL  ,GEM_KEY_LEFT  ,GEM_KEY_OK   ,GEM_KEY_RIGHT  },
+    {'Z'             ,'Z'           ,GEM_KEY_DOWN ,'Z'            },
+    {'Z'             ,'Z'           ,'Z'          ,'Z'            }
+  };
+  byte rowPins[ROWS] = {PA5, PA4, PA3, PA2}; //connect to the row pinouts of the keypad
+  byte colPins[COLS] = {PB0, PB1, PB10, PB11}; //connect to the column pinouts of the keypad
+  //initialize an instance of class NewKeypad
+  Keypad customKeypad ( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+  //customKeypad.getKey();
+#endif
 
 typedef struct
 {
@@ -45,7 +65,10 @@ void ActionSaveSettingsInFlash(); // Forward declaration
 GEMItem menuItemButtonSaveSettings("Save settings", ActionSaveSettingsInFlash);
 
 void ActionDro(); // Forward declaration
-GEMItem menuItemButton("DRO screen", ActionDro);
+GEMItem menuItemButtonDro("DRO screen", ActionDro);
+
+void ActionDebug(); // Forward declaration
+GEMItem menuItemButtonDebug("Debug screen", ActionDebug);
 
 //Main Page Menu
 GEMPage menuPageMain("Dro Menu");
@@ -86,7 +109,12 @@ void setup() {
 
   // U8g2 library init. Pass pin numbers the buttons are connected to.
   // The push-buttons should be wired with pullup resistors (so the LOW means that the button is pressed)
-  u8g2.begin(/*Select/OK=*/ PB14, /*Right/Next=*/ PB1, /*Left/Prev=*/ PB0, /*Up=*/ PB15, /*Down=*/ PB12, /*Home/Cancel=*/ PB13);
+  #ifdef USE_KEYPAD_KEYBOARD
+    u8g2.begin();
+  #endif
+  #ifndef USE_KEYPAD_KEYBOARD
+    u8g2.begin(/*Select/OK=*/ PB14, /*Right/Next=*/ PB1, /*Left/Prev=*/ PB0, /*Up=*/ PB15, /*Down=*/ PB12, /*Home/Cancel=*/ PB13);
+  #endif
   //Restore config  
   Restore_Config();
   // Menu init, setup and draw
@@ -94,11 +122,13 @@ void setup() {
   setupMenu();
   //menu.drawMenu(); //Start with menu screen
   ActionDro(); //Start with dro screen
+  //ActionDebug(); //Start with dro screen
 }
 
 void setupMenu() {
   // Add menu items to menu page
-  menuPageMain.addMenuItem(menuItemButton);
+  menuPageMain.addMenuItem(menuItemButtonDro);
+  menuPageMain.addMenuItem(menuItemButtonDebug);
   menuPageMain.addMenuItem(menuItemTool);
   menuPageMain.addMenuItem(menuItemRelativeMode);
   //Add Sub menu Settings
@@ -123,11 +153,16 @@ void loop() {
   if (menu.readyForKey()) {
     // ...detect key press using U8g2 library
     // and pass pressed button to menu
+    #ifndef USE_KEYPAD_KEYBOARD
     menu.registerKeyPress(u8g2.getMenuEvent());
+    #endif
+    #ifdef USE_KEYPAD_KEYBOARD
+    menu.registerKeyPress(customKeypad.getKey());
+    #endif    
   }
 }
 
-// Setup context for DRO main display
+// *** DRO context with axe display
 void ActionDro() {
   menu.context.loop = DroContextLoop;
   menu.context.enter = DroContextEnter;
@@ -141,8 +176,14 @@ void DroContextEnter() {
 }
 void DroContextLoop() {
   // Detect key press manually using U8g2 library
-  byte key = u8g2.getMenuEvent();
-  if (key == GEM_KEY_CANCEL) {
+    #ifndef USE_KEYPAD_KEYBOARD
+      byte key = u8g2.getMenuEvent();
+    #endif
+    #ifdef USE_KEYPAD_KEYBOARD
+      byte key = customKeypad.getKey();
+    #endif  
+  if (key == GEM_KEY_CANCEL) 
+  { 
     // Exit animation routine if GEM_KEY_CANCEL key was pressed
     menu.context.exit();
   } else 
@@ -159,6 +200,59 @@ void DroContextExit()
   menu.drawMenu();
   menu.clearContext();
 }
+
+
+// *** Debug context
+void ActionDebug()
+{
+  menu.context.loop = DebugContextLoop;
+  menu.context.enter = DebugContextEnter;
+  menu.context.exit = DebugContextExit;
+  menu.context.allowExit = false; // Setting to false will require manual exit from the loop
+  menu.context.enter();    
+}
+void DebugContextEnter() {
+  // Clear sreen
+  u8g2.clear();
+}
+void DebugContextLoop() {
+  // Detect key press manually using U8g2 library
+    #ifndef USE_KEYPAD_KEYBOARD
+      byte key = u8g2.getMenuEvent();
+    #endif
+    #ifdef USE_KEYPAD_KEYBOARD
+      byte key = customKeypad.getKey();
+    #endif  
+  u8g2.firstPage();
+  do {
+  u8g2.setColorIndex(1);
+  u8g2.setFont(u8g2_font_profont10_mr); // choose a suitable font
+  char buffer_x[16];
+  sprintf(buffer_x,"%x",key);
+  u8g2.drawStr(2,1,buffer_x);
+  sprintf(buffer_x,"%x",GEM_KEY_CANCEL);
+  u8g2.drawStr(2,20,buffer_x);
+  
+  } while (u8g2.nextPage());
+  if (key == GEM_KEY_CANCEL) 
+  { 
+    // Exit animation routine if GEM_KEY_CANCEL key was pressed
+    menu.context.exit();
+  }
+
+}
+void DebugContextExit() 
+{
+  menu.reInit();
+  menu.drawMenu();
+  menu.clearContext();
+}
+
+
+
+
+
+
 void Restore_Config()
 {
   //Read Config in Memory
