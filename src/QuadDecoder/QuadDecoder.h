@@ -18,7 +18,7 @@ QuadDecoder(unsigned int  TimerChannel,teTypeEncoder  eTypeEncoder, unsigned int
 
 //To update value
 void IT_OverflowHardwareTimer(); //IT overflow hardware timer
-void TestReconf();
+
 
 void SetAbsolut();
 void SetRelative();
@@ -40,11 +40,12 @@ void ToggleSens();
 void SetDiameterMode (boolean DiameterMode);
 void ToggleDiameterMode();
 void ResetAllTheCounter();
-void ChangeOverflowSize(unsigned int  OverflowSize);
+
 
 private:
   void ComputeAbsoluteValue();
   void InitSpeedMeasure();
+  void UpdatOverflowSize();
   teTypeEncoder _eTypeEncoder;
   unsigned int _CountValue; //Encoder count value
   unsigned int _Overflow_Size; //Overflow size default = 65536

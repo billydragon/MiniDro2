@@ -19,9 +19,7 @@ QuadDecoder::QuadDecoder(unsigned int  TimerChannel,teTypeEncoder  eTypeEncoder,
   _Resolution = Resolution;
   _Overflow = 0;
   _eTypeEncoder = eTypeEncoder;
-  if(_eTypeEncoder==LinearEncoder)_Overflow_Size = 0xFFFF;
-  else _Overflow_Size = _Resolution-1;  
-     
+  UpdatOverflowSize();     
   _AbsoluteCounter = 0;
   _Sens = Sens;
   _AbsoluteCounterZero = 0;
@@ -60,19 +58,7 @@ QuadDecoder::QuadDecoder(unsigned int  TimerChannel,teTypeEncoder  eTypeEncoder,
   InitSpeedMeasure();
    
 }
-void QuadDecoder::TestReconf()
-{
-  _HardwareTimer->setMode(1, TIMER_ENCODER); //set mode, the channel is not used when in this mode. 
 
-  _HardwareTimer->pause(); //stop...
-  _HardwareTimer->setPrescaleFactor(1); //normal for encoder to have the lowest or no prescaler. 
-  _HardwareTimer->setOverflow(_Overflow_Size);    
-  _HardwareTimer->setCount(0); //reset the counter. 
-  _HardwareTimer->setEdgeCounting(TIMER_SMCR_SMS_ENCODER3); //or TIMER_SMCR_SMS_ENCODER1 or TIMER_SMCR_SMS_ENCODER2. This uses both channels to count and ascertain direction. 
-  //_HardwareTimer->attachInterrupt(0, handler); //Overflow interrupt (extern function)  
-  _HardwareTimer->resume();//start the encoder...  
-  
-}
 void QuadDecoder::SetValue(float Value)
 {
   long temp;
@@ -135,24 +121,13 @@ unsigned int QuadDecoder::GetValuePos()
   }       
 }
 
-void QuadDecoder::SetAbsolut()
-{
-  _RelativeModeActived = false; 
-}
-void QuadDecoder::SetRelative()
-{
-  _RelativeModeActived = true;
-}
-
-
-void QuadDecoder::SwitchMode()
-{
-  _RelativeModeActived = !_RelativeModeActived;  
-}
-boolean QuadDecoder::RelativeModeActived()
-{
-  return _RelativeModeActived;   
-}
+void QuadDecoder::SetAbsolut(){ _RelativeModeActived = false;}
+void QuadDecoder::SetRelative(){ _RelativeModeActived = true;}
+void QuadDecoder::SwitchMode(){_RelativeModeActived = !_RelativeModeActived;}
+boolean QuadDecoder::RelativeModeActived(){return _RelativeModeActived;}
+void QuadDecoder::SetDiameterMode (boolean DiameterMode){_DiameterMode = DiameterMode;}
+void QuadDecoder::ToggleSens(){_Sens = !_Sens;}
+void QuadDecoder::ToggleDiameterMode(){_DiameterMode = !_DiameterMode;}
 
 void QuadDecoder::SetAbsolutZero()
 {
@@ -187,25 +162,19 @@ void QuadDecoder::ComputeAbsoluteValue()
 
 void QuadDecoder::SetResolution(unsigned int  Resolution)
 {
+  _HardwareTimer->pause(); //stop...
+  ResetAllTheCounter();
   _Resolution = Resolution;   
+  UpdatOverflowSize();
+  _HardwareTimer->setOverflow(_Overflow_Size);    
+  _HardwareTimer->setCount(0); //reset the counter. 
+  _HardwareTimer->resume();//start the encoder... 
 }
 void QuadDecoder::SetSens(boolean Sens)
 {
   _Sens = Sens;    
 }
-void QuadDecoder::SetDiameterMode (boolean DiameterMode)
-{
-  _DiameterMode = DiameterMode;   
-}
 
-void QuadDecoder::ToggleSens()
-{
-  _Sens = !_Sens;  
-}
-void QuadDecoder::ToggleDiameterMode()
-{
-  _DiameterMode = !_DiameterMode;  
-}
 void QuadDecoder::ResetAllTheCounter()
 {
   _Overflow = 0; 
@@ -213,12 +182,6 @@ void QuadDecoder::ResetAllTheCounter()
   _AbsoluteCounterZero = 0;
   _RelativeCounterZero = 0; 
   InitSpeedMeasure();  
-}
-
-void QuadDecoder::ChangeOverflowSize(unsigned int  OverflowSize)
-{
-  ResetAllTheCounter();
-  _Overflow_Size = OverflowSize;  
 }
 
 void QuadDecoder::InitSpeedMeasure()
@@ -243,4 +206,10 @@ int QuadDecoder::GiveMeTheSpeed()
     _PosCalcSpeed = Pos;      
   }
   return _Speed; 
+}
+void QuadDecoder::UpdatOverflowSize()
+{
+  if(_eTypeEncoder==LinearEncoder)_Overflow_Size = 0xFFFF;
+  else _Overflow_Size = _Resolution-1;   
+
 }
