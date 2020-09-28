@@ -17,7 +17,7 @@ Revision        :
 #include "src/Keypad/Keypad.h"
 #include <EEPROM.h>
 
-#define USE_KEYPAD_KEYBOARD
+//#define USE_KEYPAD_KEYBOARD
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
@@ -98,9 +98,9 @@ GEM_u8g2 menu(u8g2);
 void IT_Timer1_Overflow(); // Forward declaration
 void IT_Timer2_Overflow(); // Forward declaration
 void IT_Timer3_Overflow(); // Forward declaration
-QuadDecoder Quad_Y(3,0xFFFF,512,false,false,IT_Timer3_Overflow); //Timer 3
-QuadDecoder Quad_Z(2,0xFFFF,512,true,false,IT_Timer2_Overflow); //Timer 2
-QuadDecoder Quad_X(1,0xFFFF,512,false,false,IT_Timer1_Overflow); //Timer 1
+QuadDecoder Quad_Y(3,QuadDecoder::LinearEncoder,512,false,false,IT_Timer3_Overflow); //Timer 3
+QuadDecoder Quad_Z(2,QuadDecoder::LinearEncoder,512,true,false,IT_Timer2_Overflow); //Timer 2
+QuadDecoder Quad_X(1,QuadDecoder::LinearEncoder,512,false,false,IT_Timer1_Overflow); //Timer 1
 void IT_Timer1_Overflow(){Quad_X.IT_OverflowHardwareTimer();}
 void IT_Timer2_Overflow(){Quad_Z.IT_OverflowHardwareTimer();}
 void IT_Timer3_Overflow(){Quad_Y.IT_OverflowHardwareTimer();}
@@ -228,10 +228,11 @@ void DebugContextLoop() {
   u8g2.setColorIndex(1);
   u8g2.setFont(u8g2_font_profont10_mr); // choose a suitable font
   char buffer_x[16];
-  sprintf(buffer_x,"%x",key);
+  sprintf(buffer_x,"Speed:%d",Quad_X.GiveMeTheSpeed());
   u8g2.drawStr(2,1,buffer_x);
-  sprintf(buffer_x,"%x",GEM_KEY_CANCEL);
-  u8g2.drawStr(2,20,buffer_x);
+  sprintf(buffer_x,"timer:%ld",millis());
+  u8g2.drawStr(2,15,buffer_x);
+
   
   } while (u8g2.nextPage());
   if (key == GEM_KEY_CANCEL) 

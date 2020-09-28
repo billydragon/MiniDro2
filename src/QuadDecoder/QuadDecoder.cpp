@@ -14,11 +14,14 @@ void QuadDecoder::IT_OverflowHardwareTimer()
 }
 
 
-QuadDecoder::QuadDecoder(unsigned int  TimerChannel,unsigned int  OverflowSize, unsigned int  Resolution , boolean Sens, boolean DiameterMode,voidFuncPtr handler)
+QuadDecoder::QuadDecoder(unsigned int  TimerChannel,teTypeEncoder  eTypeEncoder, unsigned int  Resolution , boolean Sens, boolean DiameterMode,voidFuncPtr handler)
 {
   _Resolution = Resolution;
   _Overflow = 0;
-  _Overflow_Size = OverflowSize; 
+  _eTypeEncoder = eTypeEncoder;
+  if(_eTypeEncoder==LinearEncoder)_Overflow_Size = 0xFFFF;
+  else _Overflow_Size = _Resolution-1;  
+     
   _AbsoluteCounter = 0;
   _Sens = Sens;
   _AbsoluteCounterZero = 0;
@@ -53,6 +56,8 @@ QuadDecoder::QuadDecoder(unsigned int  TimerChannel,unsigned int  OverflowSize, 
   _HardwareTimer->setEdgeCounting(TIMER_SMCR_SMS_ENCODER3); //or TIMER_SMCR_SMS_ENCODER1 or TIMER_SMCR_SMS_ENCODER2. This uses both channels to count and ascertain direction. 
   _HardwareTimer->attachInterrupt(0, handler); //Overflow interrupt (extern function)  
   _HardwareTimer->resume();//start the encoder...
+  
+  InitSpeedMeasure();
    
 }
 void QuadDecoder::TestReconf()
@@ -206,11 +211,36 @@ void QuadDecoder::ResetAllTheCounter()
   _Overflow = 0; 
   _AbsoluteCounter = 0;
   _AbsoluteCounterZero = 0;
-  _RelativeCounterZero = 0;  
+  _RelativeCounterZero = 0; 
+  InitSpeedMeasure();  
 }
 
 void QuadDecoder::ChangeOverflowSize(unsigned int  OverflowSize)
 {
   ResetAllTheCounter();
   _Overflow_Size = OverflowSize;  
+}
+
+void QuadDecoder::InitSpeedMeasure()
+{
+  ComputeAbsoluteValue();
+  _TimeCalcSpeed = millis();
+  _Speed = 0;
+  _PosCalcSpeed = _AbsoluteCounter;  
+}
+int QuadDecoder::GiveMeTheSpeed()
+{
+  long Time;
+  long Pos;
+  Time = millis();
+  ComputeAbsoluteValue();
+  Pos = _AbsoluteCounter;  
+  if(Time > (_TimeCalcSpeed+200) )
+  {
+    _Speed = (int)((Pos - _PosCalcSpeed)*60000)/((Time - _TimeCalcSpeed)*_Resolution); 
+    //Spindle_Speed = DeltaPos;   
+    _TimeCalcSpeed = Time;
+    _PosCalcSpeed = Pos;      
+  }
+  return _Speed; 
 }
