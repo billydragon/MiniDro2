@@ -52,13 +52,13 @@ const sConfigDro csConfigDefault = {false,false,false,false,512,512,512};
 // Variable
 sConfigDro ConfigDro;
 
-GEMItem menuItemDirX("Direction X", ConfigDro.Inverted_X);
-GEMItem menuItemDirY("Direction Y", ConfigDro.Inverted_Y);
-GEMItem menuItemDirZ("Direction Z", ConfigDro.Inverted_Z);
+GEMItem menuItemDirX("X dir:", ConfigDro.Inverted_X);
+GEMItem menuItemDirY("Y dir:", ConfigDro.Inverted_Y);
+GEMItem menuItemDirZ("Z dir:", ConfigDro.Inverted_Z);
 GEMItem menuItemDiamY("Diameter Y", ConfigDro.Diameter_Mode_Y);
-GEMItem menuItemResoX("Resolution X", ConfigDro.Reso_X);
-GEMItem menuItemResoY("Resolution Y", ConfigDro.Reso_Y);
-GEMItem menuItemResoZ("Resolution Z", ConfigDro.Reso_Z);
+GEMItem menuItemResoX("X step/mm:", ConfigDro.Reso_X);
+GEMItem menuItemResoY("Y step/mm:", ConfigDro.Reso_Y);
+GEMItem menuItemResoZ("Z step/mm:", ConfigDro.Reso_Z);
 void ActionRestoreSettingsInFlash(); // Forward declaration
 GEMItem menuItemButtonRestoreSettings("Restore settings", ActionRestoreSettingsInFlash);
 void ActionSaveSettingsInFlash(); // Forward declaration
