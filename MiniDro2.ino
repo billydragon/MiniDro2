@@ -99,8 +99,8 @@ void IT_Timer1_Overflow(); // Forward declaration
 void IT_Timer2_Overflow(); // Forward declaration
 void IT_Timer3_Overflow(); // Forward declaration
 QuadDecoder Quad_Y(3,QuadDecoder::LinearEncoder,512,false,false,IT_Timer3_Overflow); //Timer 3
-QuadDecoder Quad_Z(2,QuadDecoder::LinearEncoder,512,true,false,IT_Timer2_Overflow); //Timer 2
-QuadDecoder Quad_X(1,QuadDecoder::RotaryEncoder,512,false,false,IT_Timer1_Overflow); //Timer 1
+QuadDecoder Quad_Z(2,QuadDecoder::RotaryEncoder,512,true,false,IT_Timer2_Overflow); //Timer 2
+QuadDecoder Quad_X(1,QuadDecoder::LinearEncoder,512,false,false,IT_Timer1_Overflow); //Timer 1
 void IT_Timer1_Overflow(){Quad_X.IT_OverflowHardwareTimer();}
 void IT_Timer2_Overflow(){Quad_Z.IT_OverflowHardwareTimer();}
 void IT_Timer3_Overflow(){Quad_Y.IT_OverflowHardwareTimer();}
@@ -228,12 +228,12 @@ void DebugContextLoop() {
       u8g2.setColorIndex(1);
       u8g2.setFont(u8g2_font_profont10_mr); // choose a suitable font
       char buffer[16];
-      sprintf(buffer,"Speed:%d",Quad_X.GiveMeTheSpeed());
+      sprintf(buffer,"Speed Z:%d",Quad_Z.GiveMeTheSpeed());
       u8g2.drawStr(2,1,buffer);
       sprintf(buffer,"millis():%ld",millis());
-      u8g2.drawStr(2,15,buffer);
-      sprintf(buffer,"pos:%d",Quad_X.GetValuePos());
-      u8g2.drawStr(2,30,buffer);
+      u8g2.drawStr(2,10,buffer);
+      sprintf(buffer,"pos Z:%d",Quad_Z.GetValuePos());
+      u8g2.drawStr(2,19,buffer);
   
   } while (u8g2.nextPage());
   if (key == GEM_KEY_CANCEL) 
@@ -241,7 +241,6 @@ void DebugContextLoop() {
     // Exit animation routine if GEM_KEY_CANCEL key was pressed
     menu.context.exit();
   }
-
 }
 void DebugContextExit() 
 {
