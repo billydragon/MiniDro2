@@ -237,7 +237,7 @@ int QuadDecoder::GiveMeTheSpeed()
   Pos = _AbsoluteCounter;  
   if(Time > (_TimeCalcSpeed+200) )
   {
-    _Speed = (int)((Pos - _PosCalcSpeed)*60000)/((Time - _TimeCalcSpeed)*_Resolution); 
+    _Speed = (int)((long)(Pos - _PosCalcSpeed)*60000)/(long)((Time - _TimeCalcSpeed)*_Resolution); 
     //Spindle_Speed = DeltaPos;   
     _TimeCalcSpeed = Time;
     _PosCalcSpeed = Pos;      
